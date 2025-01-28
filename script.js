@@ -4,36 +4,50 @@ const apiUrl = "https://api.openweathermap.org/data/2.5/weather?units=metric&q="
 const searchBox = document.querySelector(".search input");
 const searchBtn = document.querySelector(".search button");
 const weatherIcon = document.querySelector(".weather-icon");
-const errorText = document.querySelector(".error");
 
 async function checkWeather(city) {
-  try {
-    const response = await fetch(apiUrl + city + `&appid=${apiKey}`);
-    if (!response.ok) throw new Error('City not found');
-    const data = await response.json();
+    try {
+        const response = await fetch(apiUrl + city + `&appid=${apiKey}`);
+        if (!response.ok) {
+            throw new Error('City not found');
+        }
 
-    errorText.style.display = 'none';
-    document.querySelector(".city").innerText = data.name;
-    document.querySelector(".temp").innerText = Math.round(data.main.temp) + "°C";
-    document.querySelector(".humidity").innerText = data.main.humidity + "%";
-    document.querySelector(".wind").innerText = data.wind.speed + " km/h";
+        var data = await response.json();
+        console.log(data);
 
-    const weatherCondition = data.weather[0].main;
-    weatherIcon.src = `imgs/${weatherCondition.toLowerCase()}.png`;
-  } catch (error) {
-    errorText.style.display = 'block';
-    console.error(error);
-  }
+        document.querySelector(".city").innerHTML = data.name;
+        document.querySelector(".temp").innerHTML = Math.round(data.main.temp) + "°C";
+        document.querySelector(".humidity").innerHTML = data.main.humidity + "%";
+        document.querySelector(".wind").innerHTML = data.wind.speed + " km/h";
+
+        if (data.weather[0].main == "Clouds") {
+            weatherIcon.src = "imgs/clouds.png";
+        } else if (data.weather[0].main == "Clear") {
+            weatherIcon.src = "imgs/clear.png";
+        } else if (data.weather[0].main == "Rain") {
+            weatherIcon.src = "imgs/rain.png";
+        } else if (data.weather[0].main == "Drizzle") {
+            weatherIcon.src = "imgs/drizzle.png";
+        } else if (data.weather[0].main == "Mist") {
+            weatherIcon.src = "imgs/mist.png";
+        }
+
+    } catch (error) {
+        console.error(error);
+        alert('Error fetching weather data: ' + error.message);
+    }
 }
 
-searchBtn.addEventListener("click", () => {
-  checkWeather(searchBox.value);
-});
+function handleSearch() {
+    checkWeather(searchBox.value);
+}
+
+searchBtn.addEventListener("click", handleSearch);
 
 searchBox.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
-    checkWeather(searchBox.value);
-  }
+    if (e.key === "Enter") {
+        handleSearch();
+    }
 });
 
 checkWeather('Medina');
